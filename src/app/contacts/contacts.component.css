@@ -1,0 +1,15 @@
+.spacing {
+    margin: 5px;
+    
+}
+
+.nav-action-container {
+    margin: 20px auto; 
+    width:90%; 
+}
+
+.contact-grid {
+    display:grid;
+    margin: 20px auto; 
+    width:90%; 
+}
