@@ -15,15 +15,15 @@
         </li>
       </ul>
       <form class="form-inline my-2 my-lg-0">
-        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-light my-2 my-sm-0" type="submit">Search</button>
+        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" [(ngModel)]="contactParams" name="search">
+        <button class="btn btn-outline-light my-2 my-sm-0" type="submit" (click)="search(contactParams)">Search</button>
       </form>
     </div>
   </nav>
   
   <ul class="nav justify-content-end nav-action-container">
     <li class="nav-item">
-      <button type="button" class="btn btn-secondary spacing" (click)="getItemsFromLocalStorage('contacts')">Load Contacts</button>
+      <button type="button" class="btn btn-secondary spacing" (click)="loadContacts()">Load Contacts</button>
   
     </li>
     <li class="nav-item">
@@ -59,7 +59,7 @@
               <td *ngIf="!contact.editing">{{contact.email}}</td>
               <td *ngIf="!contact.editing">{{contact.phoneNumber}}</td>
               <td *ngIf="!contact.editing">
-                  <button type="button" class="btn btn-danger" (click)="delete(contact)">X</button>
+                  <button type="button" class="btn btn-danger" (click)="delete(i)">X</button>
               </td>
              
               <th *ngIf="contact.editing" scope="row">
@@ -82,8 +82,10 @@
 
               </td>
               <td *ngIf="contact.editing">
-                  
-                  <button type="button" class="btn btn-success" (click)="save(contact)">Save</button>
+                  <div class="btn-group">
+                    <button type="button" class="btn btn-success" (click)="save(contact)">Save</button>
+                    <button type="button" class="btn btn-danger" (click)="delete(i)">X</button>
+                  </div>
                 </td>
             </tr>
           </tbody>

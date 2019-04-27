@@ -10,12 +10,25 @@ import { Http } from '@angular/http';
 export class ContactsComponent implements OnInit {
 
   contacts: Array<Contact> = [];
+  contactParams: string = '';
   constructor(private http: Http) { }
 
   async ngOnInit() {
+    this.loadContacts();
 
-    this.contacts = await this.loadItemsFromFile();
 
+  }
+
+  async loadContacts() {
+    const savedContacts = this.getItemsFromLocalStorage('contacts');
+    if (savedContacts.length > 0) {
+      this.contacts = savedContacts;
+
+
+    } else {
+      this.contacts = await this.loadItemsFromFile();
+    }
+    this.sortById(this.contacts);
   }
 
   async loadItemsFromFile() {
@@ -25,25 +38,48 @@ export class ContactsComponent implements OnInit {
 
   addContact() {
     this.contacts.unshift(new Contact({}));
+
   }
 
   delete(index: number) {
     this.contacts.splice(index, 1);
+    this.saveItemsToLocalStorage(this.contacts);
   }
 
   save(contacts: any) {
+    this.sortById(this.contacts);
     contacts.editing = false;
 
   }
-
   saveItemsToLocalStorage(contacts: Array<Contact>) {
-   const savedContacts = localStorage.setItem('contacts', JSON.stringify(Contact));
-   return savedContacts;
+    const savedContacts = localStorage.setItem('contacts', JSON.stringify(contacts));
+    return savedContacts;
   }
 
   getItemsFromLocalStorage(key: string) {
-   const savedContacts = JSON.parse(localStorage.getItem(key));
-   return savedContacts;
+    const savedContacts = JSON.parse(localStorage.getItem(key));
+    return savedContacts;
+
   }
+
+  search(params: string) {
+
+    this.contacts = this.contacts.filter((item: Contact) => {
+      const fullName = item.firstName + ' ' + item.lastName;
+      if (params === fullName || params === item.firstName || params === item.lastName) {
+        return true;
+      } else {
+        return false;
+      }
+    });
+  }
+
+  sortById(contacts: Array<Contact>) {
+    contacts.sort((a: Contact, b: Contact) => {
+
+      return a.id > b.id ? 1 : -1;
+    });
+  }
+
 
 }
