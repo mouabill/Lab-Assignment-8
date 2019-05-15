@@ -1,6 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Contact } from './contacts.model';
 import { Http } from '@angular/http';
+import { LocalStorageService } from '../localStorageService';
+import { ActivatedRoute } from '@angular/router';
+import { IUser } from '../login/login.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-contacts',
@@ -10,11 +14,24 @@ import { Http } from '@angular/http';
 export class ContactsComponent implements OnInit {
 
   contacts: Array<Contact> = [];
-  contactParams: string = '';
-  constructor(private http: Http) { }
+  contactParams = '';
+  localStorageService: LocalStorageService<Contact>;
+  currentUser: IUser;
+  constructor(private http: Http, private activatedRoute: ActivatedRoute, private router: Router) {
+    this.localStorageService = new LocalStorageService('contacts');
+  }
 
   async ngOnInit() {
+    const currentUser = this.localStorageService.getItemsFromLocalStorage('user');
+    if (currentUser == null) {
+      this.router.navigate(['login']);
+    }
+
     this.loadContacts();
+    this.activatedRoute.params.subscribe((data: IUser) => {
+      console.log('data passed from login component to this component', data);
+      this.currentUser = data;
+    });
 
 
   }
@@ -52,13 +69,15 @@ export class ContactsComponent implements OnInit {
 
   }
   saveItemsToLocalStorage(contacts: Array<Contact>) {
-    const savedContacts = localStorage.setItem('contacts', JSON.stringify(contacts));
-    return savedContacts;
+    // const savedContacts = localStorage.setItem('contacts', JSON.stringify(contacts));
+    // contacts = this.sortById(contacts);
+    return this.localStorageService.saveItemsToLocalStorage(contacts);
   }
 
   getItemsFromLocalStorage(key: string) {
-    const savedContacts = JSON.parse(localStorage.getItem(key));
-    return savedContacts;
+
+    // const savedContacts = JSON.parse(localStorage.getItem(key));
+    return this.localStorageService.getItemsFromLocalStorage();
 
   }
 
@@ -79,6 +98,11 @@ export class ContactsComponent implements OnInit {
 
       return a.id > b.id ? 1 : -1;
     });
+  }
+
+  logOut() {
+    this.localStorageService.clearItemFromLocalStorage('user');
+    this.router.navigate(['']);
   }
 
 
